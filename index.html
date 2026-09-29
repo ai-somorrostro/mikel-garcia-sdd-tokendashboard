@@ -37,6 +37,31 @@
         </label>
       </div>
       <p id="status" role="status" aria-live="polite"></p>
+      <section class="charts" aria-label="Gráficas de modelos">
+        <figure class="chart">
+          <figcaption>Precios por token (input vs output)</figcaption>
+          <svg id="price-chart" viewBox="0 0 640 320" role="img" aria-labelledby="price-chart-title price-chart-desc">
+            <title id="price-chart-title">Comparativa de precios por token</title>
+            <desc id="price-chart-desc">Sin datos cargados.</desc>
+          </svg>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="swatch series-in"></span>Input</span>
+            <span class="legend-item"><span class="swatch series-out"></span>Output</span>
+          </div>
+        </figure>
+        <figure class="chart">
+          <figcaption>Consumo diario y semanal (input+output)</figcaption>
+          <div id="consumption-minis" role="img" aria-labelledby="minis-title minis-desc">
+            <p id="minis-title" class="sr-only">Consumo de tokens por modelo</p>
+            <p id="minis-desc" class="sr-only">Sin datos cargados.</p>
+          </div>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="swatch series-in"></span>Input</span>
+            <span class="legend-item"><span class="swatch series-out"></span>Output</span>
+          </div>
+        </figure>
+        <p id="charts-empty" hidden>Sin resultados para los filtros activos.</p>
+      </section>
       <div class="table-wrapper">
         <table id="models-table">
           <thead>
