@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard de Modelos de IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Dashboard de Modelos de IA</h1>
+    <p>Comparativa de precios, latencia, modalidades y consumo de tokens</p>
+  </header>
+  <main>
+    <section aria-labelledby="models-heading">
+      <h2 id="models-heading">Modelos</h2>
+      <div class="toolbar" role="search" aria-label="Filtros de modelos">
+        <label class="toolbar-field">
+          <span>Buscar modelo</span>
+          <input type="search" id="filter-name" placeholder="Nombre del modelo…" autocomplete="off">
+        </label>
+        <label class="toolbar-field">
+          <span>Modalidad de entrada</span>
+          <select id="filter-input-modality">
+            <option value="all">Todas</option>
+            <option value="Text">Text</option>
+            <option value="Text+Image">Text+Image</option>
+          </select>
+        </label>
+        <label class="toolbar-field">
+          <span>Modalidad de salida</span>
+          <select id="filter-output-modality">
+            <option value="all">Todas</option>
+            <option value="Text">Text</option>
+          </select>
+        </label>
+      </div>
+      <p id="status" role="status" aria-live="polite"></p>
+      <section class="charts" aria-label="Gráficas de modelos">
+        <figure class="chart">
+          <figcaption>Precios por token (input vs output)</figcaption>
+          <svg id="price-chart" viewBox="0 0 640 320" role="img" aria-labelledby="price-chart-title price-chart-desc">
+            <title id="price-chart-title">Comparativa de precios por token</title>
+            <desc id="price-chart-desc">Sin datos cargados.</desc>
+          </svg>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="swatch series-in"></span>Input</span>
+            <span class="legend-item"><span class="swatch series-out"></span>Output</span>
+          </div>
+        </figure>
+        <figure class="chart">
+          <figcaption>Consumo diario y semanal (input+output)</figcaption>
+          <div id="consumption-minis" role="img" aria-labelledby="minis-title minis-desc">
+            <p id="minis-title" class="sr-only">Consumo de tokens por modelo</p>
+            <p id="minis-desc" class="sr-only">Sin datos cargados.</p>
+          </div>
+          <div class="legend" aria-hidden="true">
+            <span class="legend-item"><span class="swatch series-in"></span>Input</span>
+            <span class="legend-item"><span class="swatch series-out"></span>Output</span>
+          </div>
+        </figure>
+        <p id="charts-empty" hidden>Sin resultados para los filtros activos.</p>
+      </section>
+      <div class="table-wrapper">
+        <table id="models-table">
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none"><button type="button" data-key="name">Modelo</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputPricePerToken">Input $/token</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputPricePerToken">Output $/token</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="ttft_ms">TTFT (ms)</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="inputModality">Modalidad In</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="outputModality">Modalidad Out</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputTokensDay">Tokens In Día</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputTokensDay">Tokens Out Día</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputTokensWeek">Tokens In Semana</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputTokensWeek">Tokens Out Semana</button></th>
+            </tr>
+          </thead>
+          <tbody id="models-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <div id="drawer-backdrop" hidden></div>
+  <aside id="detail-drawer" role="dialog" aria-label="Detalle del modelo" hidden>
+    <div class="drawer-head">
+      <h2 id="detail-title">Detalle del modelo</h2>
+      <button type="button" id="detail-close" aria-label="Cerrar detalle">X</button>
+    </div>
+    <div id="detail-body"></div>
+  </aside>
+</body>
+</html>
