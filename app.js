@@ -13,6 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
   var minisBox = document.getElementById("consumption-minis");
   var minisDesc = document.getElementById("minis-desc");
   var chartsEmpty = document.getElementById("charts-empty");
+  var drawer = document.getElementById("detail-drawer");
+  var backdrop = document.getElementById("drawer-backdrop");
+  var detailTitle = document.getElementById("detail-title");
+  var detailBody = document.getElementById("detail-body");
+  var detailClose = document.getElementById("detail-close");
 
   var SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -47,6 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
     inputModality: "all",
     outputModality: "all"
   };
+  var selectedName = null;
+  var openerName = null;
 
   function setError(message) {
     statusEl.textContent = message;
@@ -253,6 +260,19 @@ document.addEventListener("DOMContentLoaded", function () {
     render(visible);
     renderCharts(visible);
     updateSortIndicators();
+
+    if (selectedName !== null) {
+      var stillVisible = false;
+      for (var i = 0; i < visible.length; i++) {
+        if (String(visible[i].name) === selectedName) {
+          stillVisible = true;
+          break;
+        }
+      }
+      if (!stillVisible) {
+        closeDetail();
+      }
+    }
   }
 
   function render(visible) {
@@ -260,6 +280,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     visible.forEach(function (model) {
       var row = document.createElement("tr");
+      row.setAttribute("tabindex", "0");
+      row.setAttribute("data-name", String(model.name));
+      row.setAttribute("title", "Ver detalle de " + String(model.name));
       COLUMNS.forEach(function (key) {
         var cell = document.createElement("td");
         cell.textContent = String(model[key]);
@@ -278,6 +301,220 @@ document.addEventListener("DOMContentLoaded", function () {
       statusEl.textContent = visible.length + " de " + allModels.length + " modelos.";
     }
   }
+
+  function findModel(name) {
+    for (var i = 0; i < allModels.length; i++) {
+      if (String(allModels[i].name) === name) {
+        return allModels[i];
+      }
+    }
+    return null;
+  }
+
+  function globalMax(fn) {
+    if (allModels.length === 0) {
+      return 0;
+    }
+    return Math.max.apply(null, allModels.map(fn));
+  }
+
+  function detailRow(dl, term, value) {
+    var dt = document.createElement("dt");
+    dt.textContent = term;
+    var dd = document.createElement("dd");
+    dd.textContent = value;
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+  }
+
+  function detailBlock(title, rows) {
+    var sec = document.createElement("section");
+    sec.className = "detail-block";
+    var h = document.createElement("h3");
+    h.textContent = title;
+    sec.appendChild(h);
+    var dl = document.createElement("dl");
+    rows.forEach(function (r) {
+      detailRow(dl, r[0], r[1]);
+    });
+    sec.appendChild(dl);
+    return sec;
+  }
+
+  function renderDetail(model) {
+    detailBody.textContent = "";
+    detailTitle.textContent = String(model.name);
+    drawer.setAttribute("aria-label", "Detalle de " + String(model.name));
+
+    var costDay = model.inputTokensDay * model.inputPricePerToken +
+      model.outputTokensDay * model.outputPricePerToken;
+    var costWeek = model.inputTokensWeek * model.inputPricePerToken +
+      model.outputTokensWeek * model.outputPricePerToken;
+    var dayTotal = model.inputTokensDay + model.outputTokensDay;
+    var allDay = 0;
+    allModels.forEach(function (m) {
+      allDay += m.inputTokensDay + m.outputTokensDay;
+    });
+    var share = allDay > 0 ? (dayTotal / allDay) * 100 : 0;
+    var ratio = model.inputTokensDay > 0 ? model.outputTokensDay / model.inputTokensDay : 0;
+    var rank = 1;
+    allModels.forEach(function (m) {
+      if (m.ttft_ms < model.ttft_ms) {
+        rank++;
+      }
+    });
+
+    detailBody.appendChild(detailBlock("Precios", [
+      ["Input $/token", String(model.inputPricePerToken)],
+      ["Output $/token", String(model.outputPricePerToken)],
+      ["Ratio output/input", (model.outputPricePerToken / model.inputPricePerToken).toFixed(2) + "x"]
+    ]));
+
+    detailBody.appendChild(detailBlock("Latencia", [
+      ["TTFT", String(model.ttft_ms) + " ms"],
+      ["Ranking TTFT", rank + " de " + allModels.length]
+    ]));
+
+    detailBody.appendChild(detailBlock("Modalidades", [
+      ["Entrada", String(model.inputModality)],
+      ["Salida", String(model.outputModality)]
+    ]));
+
+    detailBody.appendChild(detailBlock("Consumo y coste", [
+      ["Tokens in día", String(model.inputTokensDay)],
+      ["Tokens out día", String(model.outputTokensDay)],
+      ["Tokens in semana", String(model.inputTokensWeek)],
+      ["Tokens out semana", String(model.outputTokensWeek)],
+      ["Coste estimado día", "$" + costDay.toFixed(2)],
+      ["Coste estimado semana", "$" + costWeek.toFixed(2)],
+      ["Cuota del total diario", share.toFixed(1) + "%"],
+      ["Ratio out/in diario", ratio.toFixed(2) + "x"]
+    ]));
+
+    var priceSec = document.createElement("section");
+    priceSec.className = "detail-block";
+    var priceH = document.createElement("h3");
+    priceH.textContent = "Precio input vs output";
+    priceSec.appendChild(priceH);
+    var maxPrice = globalMax(function (m) { return m.outputPricePerToken; });
+    var priceSvg = svgEl("svg", { viewBox: "0 0 200 60", role: "img" });
+    var priceTitle = svgTitle("Precio de " + String(model.name));
+    priceSvg.appendChild(priceTitle);
+    [["inputPricePerToken", "series-in", "Input", 8], ["outputPricePerToken", "series-out", "Output", 34]].forEach(function (cfg) {
+      var h = maxPrice > 0 ? Math.max(1, (model[cfg[0]] / maxPrice) * 44) : 1;
+      var bar = svgEl("rect", {
+        x: "20", y: String(52 - h), width: "150", height: String(h), "class": cfg[1]
+      });
+      bar.appendChild(svgTitle(cfg[2] + ": " + String(model[cfg[0]]) + " $/token"));
+      priceSvg.appendChild(bar);
+      var lab = svgEl("text", { x: "4", y: String(cfg[3]), "class": "axis-label" });
+      lab.textContent = cfg[2];
+      priceSvg.appendChild(lab);
+    });
+    priceSec.appendChild(priceSvg);
+    detailBody.appendChild(priceSec);
+
+    var consSec = document.createElement("section");
+    consSec.className = "detail-block";
+    var consH = document.createElement("h3");
+    consH.textContent = "Consumo día y semana";
+    consSec.appendChild(consH);
+    var maxDay = globalMax(function (m) { return m.inputTokensDay + m.outputTokensDay; });
+    var maxWeek = globalMax(function (m) { return m.inputTokensWeek + m.outputTokensWeek; });
+    consSec.appendChild(miniBar(dayTotal, model.inputTokensDay, model.outputTokensDay, maxDay, String(model.name) + " día"));
+    consSec.appendChild(miniBar(
+      model.inputTokensWeek + model.outputTokensWeek,
+      model.inputTokensWeek, model.outputTokensWeek, maxWeek, String(model.name) + " semana"));
+    detailBody.appendChild(consSec);
+  }
+
+  function openDetail(name, openerRow) {
+    var model = findModel(name);
+    if (!model) {
+      return;
+    }
+    selectedName = String(model.name);
+    openerName = openerRow && openerRow.getAttribute
+      ? openerRow.getAttribute("data-name")
+      : selectedName;
+    renderDetail(model);
+    drawer.hidden = false;
+    backdrop.hidden = false;
+    window.requestAnimationFrame(function () {
+      drawer.classList.add("open");
+      backdrop.classList.add("open");
+    });
+    detailClose.focus();
+  }
+
+  function focusOpener() {
+    var target = null;
+    if (openerName) {
+      var rows = tbody.querySelectorAll('tr[data-name]');
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].getAttribute("data-name") === openerName) {
+          target = rows[i];
+          break;
+        }
+      }
+    }
+    (target || searchInput).focus();
+  }
+
+  function closeDetail() {
+    if (selectedName === null) {
+      return;
+    }
+    selectedName = null;
+    drawer.classList.remove("open");
+    backdrop.classList.remove("open");
+    window.setTimeout(function () {
+      if (selectedName === null) {
+        drawer.hidden = true;
+        backdrop.hidden = true;
+      }
+    }, 260);
+    focusOpener();
+  }
+
+  function rowFromEvent(ev) {
+    var el = ev.target;
+    while (el && el !== tbody) {
+      if (el.tagName === "TR" && el.getAttribute("data-name")) {
+        return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  tbody.addEventListener("click", function (ev) {
+    var row = rowFromEvent(ev);
+    if (row) {
+      openDetail(row.getAttribute("data-name"), row);
+    }
+  });
+
+  tbody.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" && ev.key !== " ") {
+      return;
+    }
+    var row = rowFromEvent(ev);
+    if (row) {
+      ev.preventDefault();
+      openDetail(row.getAttribute("data-name"), row);
+    }
+  });
+
+  detailClose.addEventListener("click", closeDetail);
+
+  backdrop.addEventListener("click", closeDetail);
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && selectedName !== null) {
+      closeDetail();
+    }
+  });
 
   function updateSortIndicators() {
     sortButtons.forEach(function (button) {
@@ -349,6 +586,9 @@ document.addEventListener("DOMContentLoaded", function () {
       clearSvg(priceChart);
       minisBox.textContent = "";
       chartsSection.hidden = true;
+      selectedName = null;
+      drawer.hidden = true;
+      backdrop.hidden = true;
       setError("No se pudieron cargar los datos de modelos. Revisa que mock-data.json exista y sea válido.");
     });
 });
