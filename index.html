@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard de Modelos de IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Dashboard de Modelos de IA</h1>
+    <p>Comparativa de precios, latencia, modalidades y consumo de tokens</p>
+  </header>
+  <main>
+    <section aria-labelledby="models-heading">
+      <h2 id="models-heading">Modelos</h2>
+      <p id="status" role="status" aria-live="polite"></p>
+      <div class="table-wrapper">
+        <table id="models-table">
+          <thead>
+            <tr>
+              <th scope="col">Modelo</th>
+              <th scope="col" class="num">Input $/token</th>
+              <th scope="col" class="num">Output $/token</th>
+              <th scope="col" class="num">TTFT (ms)</th>
+              <th scope="col">Modalidad In</th>
+              <th scope="col">Modalidad Out</th>
+              <th scope="col" class="num">Tokens In Día</th>
+              <th scope="col" class="num">Tokens Out Día</th>
+              <th scope="col" class="num">Tokens In Semana</th>
+              <th scope="col" class="num">Tokens Out Semana</th>
+            </tr>
+          </thead>
+          <tbody id="models-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
