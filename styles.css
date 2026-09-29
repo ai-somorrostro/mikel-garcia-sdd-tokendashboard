@@ -292,3 +292,138 @@ select:focus-visible {
 #charts-empty[hidden] {
   display: none;
 }
+
+#models-body tr {
+  cursor: pointer;
+}
+
+#models-body tr:hover {
+  background-color: #d9e2ec;
+}
+
+#models-body tr:focus-visible {
+  outline: 2px solid #2cb1bc;
+  outline-offset: -2px;
+}
+
+#drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(31, 41, 51, 0.5);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#drawer-backdrop[hidden] {
+  display: none;
+}
+
+#drawer-backdrop.open {
+  opacity: 1;
+}
+
+#detail-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(400px, 100%);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  border: none;
+  border-left: 1px solid #d9e2ec;
+  box-shadow: -4px 0 16px rgba(31, 41, 51, 0.2);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#detail-drawer[hidden] {
+  display: none;
+}
+
+#detail-drawer.open {
+  transform: none;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: #243b53;
+  color: #ffffff;
+}
+
+.drawer-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#detail-close {
+  flex: 0 0 auto;
+  font: inherit;
+  font-weight: 700;
+  color: #ffffff;
+  background: none;
+  border: 1px solid #ffffff;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+#detail-body {
+  padding: 1rem 1.25rem 2rem;
+  overflow-y: auto;
+}
+
+.detail-block {
+  margin: 0 0 1.25rem;
+}
+
+.detail-block h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #62748a;
+}
+
+.detail-block dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  font-size: 0.9rem;
+}
+
+.detail-block dt {
+  color: #334e68;
+}
+
+.detail-block dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.detail-block svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  #detail-drawer {
+    width: 100%;
+    border-left: none;
+  }
+}
