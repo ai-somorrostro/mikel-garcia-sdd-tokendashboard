@@ -15,21 +15,42 @@
   <main>
     <section aria-labelledby="models-heading">
       <h2 id="models-heading">Modelos</h2>
+      <div class="toolbar" role="search" aria-label="Filtros de modelos">
+        <label class="toolbar-field">
+          <span>Buscar modelo</span>
+          <input type="search" id="filter-name" placeholder="Nombre del modelo…" autocomplete="off">
+        </label>
+        <label class="toolbar-field">
+          <span>Modalidad de entrada</span>
+          <select id="filter-input-modality">
+            <option value="all">Todas</option>
+            <option value="Text">Text</option>
+            <option value="Text+Image">Text+Image</option>
+          </select>
+        </label>
+        <label class="toolbar-field">
+          <span>Modalidad de salida</span>
+          <select id="filter-output-modality">
+            <option value="all">Todas</option>
+            <option value="Text">Text</option>
+          </select>
+        </label>
+      </div>
       <p id="status" role="status" aria-live="polite"></p>
       <div class="table-wrapper">
         <table id="models-table">
           <thead>
             <tr>
-              <th scope="col">Modelo</th>
-              <th scope="col" class="num">Input $/token</th>
-              <th scope="col" class="num">Output $/token</th>
-              <th scope="col" class="num">TTFT (ms)</th>
-              <th scope="col">Modalidad In</th>
-              <th scope="col">Modalidad Out</th>
-              <th scope="col" class="num">Tokens In Día</th>
-              <th scope="col" class="num">Tokens Out Día</th>
-              <th scope="col" class="num">Tokens In Semana</th>
-              <th scope="col" class="num">Tokens Out Semana</th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="name">Modelo</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputPricePerToken">Input $/token</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputPricePerToken">Output $/token</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="ttft_ms">TTFT (ms)</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="inputModality">Modalidad In</button></th>
+              <th scope="col" aria-sort="none"><button type="button" data-key="outputModality">Modalidad Out</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputTokensDay">Tokens In Día</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputTokensDay">Tokens Out Día</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="inputTokensWeek">Tokens In Semana</button></th>
+              <th scope="col" class="num" aria-sort="none"><button type="button" data-key="outputTokensWeek">Tokens Out Semana</button></th>
             </tr>
           </thead>
           <tbody id="models-body"></tbody>

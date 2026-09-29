@@ -96,3 +96,58 @@ tbody tr:last-child td {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+}
+
+.toolbar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334e68;
+}
+
+.toolbar-field input,
+.toolbar-field select {
+  font: inherit;
+  font-weight: 400;
+  color: #1a1a1a;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #bcccdc;
+  border-radius: 6px;
+  background-color: #ffffff;
+  min-width: 12rem;
+}
+
+thead th button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+thead th button .sort-indicator {
+  margin-left: 0.3rem;
+  font-size: 0.8em;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #2cb1bc;
+  outline-offset: 2px;
+}
